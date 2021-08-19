@@ -6,9 +6,8 @@ import { TaxisController } from '../controllers/taxis.controllers';
 
 const router = Router();
 
-// Listar
-router.post('/getDrivers', TaxisController.getDrivers);
-router.post('/', TaxisController.createPosts);
+// Datos
+router.post('/data', TaxisController.getData);
 
 export default router;
 
