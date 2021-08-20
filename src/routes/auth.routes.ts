@@ -10,7 +10,7 @@ const router = Router();
 // POST - http://localhost:3000/getToken
 router.post('/',
         [
-            check('userName', 'El Usuario es obligatorio').not().isEmpty(),
+            check('usuario', 'El Usuario es obligatorio').not().isEmpty(),
             check('password', 'El password es obligatorio').not().isEmpty(),
             validaciones.campos
         ], 

@@ -7,7 +7,7 @@ import { TaxisController } from '../controllers/taxis.controllers';
 const router = Router();
 
 // Datos
-router.post('/data', TaxisController.getData);
+router.post('/data',validaciones.jwt ,TaxisController.getData);
 
 export default router;
 
