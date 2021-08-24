@@ -21,18 +21,39 @@ class Taxis {
         if(!persona[0][0]) respuesta.error(res, 404, 'No autorizado');
         
         // Se traen los datos del vehiculo
+        // const myQuery = `
+        //     SELECT id_vehiculo, marca, modelo, dominio, motor, chasis, capacidad, nro_ordenanza, colores.descripcion AS 'color', tipo_servicio.descripcion AS 'servicio', tipo_situacion.descripcion AS 'situacion' 
+        //     FROM vehiculos 
+        //     INNER JOIN colores 
+        //     ON colores.id_color=vehiculos.id_color 
+        //     INNER JOIN tipo_servicio
+        //     ON tipo_servicio.id_tipo=vehiculos.id_tipo
+        //     INNER JOIN tipo_situacion
+        //     ON tipo_situacion.id_situacion=vehiculos.situacion
+        //     WHERE dominio=? AND vehiculos.activo='1' AND vehiculos.situacion='1'  
+        // `
+
+        // const myQuery = `
+        //     SELECT id_vehiculo, marca, modelo, dominio, motor, chasis, capacidad, nro_ordenanza, colores.descripcion AS 'color', tipo_servicio.descripcion AS 'servicio', tipo_situacion.descripcion AS 'situacion' 
+        //     FROM vehiculos 
+        //     INNER JOIN colores ON colores.id_color=vehiculos.id_color 
+        //     INNER JOIN tipo_servicio
+        //     ON tipo_servicio.id_tipo=vehiculos.id_tipo
+        //     INNER JOIN tipo_situacion
+        //     ON tipo_situacion.id_situacion=vehiculos.situacion
+        //     WHERE dominio=? AND vehiculos.activo='1' AND vehiculos.situacion='1'  
+        // `
+
         const myQuery = `
-            SELECT id_vehiculo, marca, modelo, dominio, motor, chasis, capacidad, nro_ordenanza, colores.descripcion AS 'color', tipo_servicio.descripcion AS 'servicio', tipo_situacion.descripcion AS 'situacion' 
-            FROM vehiculos 
-            INNER JOIN colores 
-            ON colores.id_color=vehiculos.id_color 
-            INNER JOIN tipo_servicio
-            ON tipo_servicio.id_tipo=vehiculos.id_tipo
-            INNER JOIN tipo_situacion
-            ON tipo_situacion.id_situacion=vehiculos.situacion
-            WHERE dominio=? AND vehiculos.activo='1' AND vehiculos.situacion='1'  
+            SELECT id_vehiculo, marca, modelo, nuevo as dominio, motor, chasis, capacidad, nro_ordenanza, colores.descripcion AS 'color', tipo_servicio.descripcion AS 'servicio', tipo_situacion.descripcion AS 'situacion'  
+            FROM ((SELECT *, REPLACE(REPLACE(dominio,'-',''),' ','') as nuevo FROM vehiculos) as temporal) 
+            INNER JOIN colores ON colores.id_color=temporal.id_color
+            INNER JOIN tipo_servicio ON tipo_servicio.id_tipo=temporal.id_tipo
+            INNER JOIN tipo_situacion ON tipo_situacion.id_situacion=temporal.situacion
+            WHERE nuevo=? AND temporal.activo='1' AND temporal.situacion='1'  
         `
-        const vehiculo: any = await conn.query(myQuery, [patente.toUpperCase()]);
+
+        const vehiculo: any = await conn.query(myQuery, [patente.toUpperCase().replace('-','').replace(' ','')]);
 
         // Existe un vehiculo habilitado?
         if(!vehiculo[0][0]) respuesta.error(res, 404, 'No autorizado');
