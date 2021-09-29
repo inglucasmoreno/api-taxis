@@ -2,6 +2,7 @@ import {Request, Response} from 'express';
 
 import { respuesta } from '../helpers/response';
 import { connect } from '../database/database';
+import chalk from 'chalk';
 
 class Taxis {
     
@@ -73,6 +74,144 @@ class Taxis {
             respuesta.error(res, 404, 'No autorizado');
         }
     }
+
+    // Obtener datos de titular
+    async getCabOwner(req: Request, res: Response){
+        try{
+            const { dni } = req.params;
+            
+            // Conexion a la base de datos
+            const conn = await connect();
+            
+            // Datos de persona
+            const myQuery_persona = `SELECT * FROM personas WHERE identificacion=?`;
+            const persona: any = await conn.query(myQuery_persona, [dni]);         
+            
+            // Error: Usuario no encontrado
+            if(!persona[0][0]) return respuesta.error(res, 400, "Datos incorrectos");
+
+            // Relaciones
+            const myQuery_relaciones = `
+                SELECT vehiculos.dominio as licensePlate, vehiculos.marca as carBrand, vehiculos.modelo as carModel, vehiculos.activo as status FROM relaciones
+                INNER JOIN vehiculos ON relaciones.id_vehiculo = vehiculos.id_vehiculo
+                WHERE id_persona=? AND tipo_persona='titular' AND relaciones.activo='1'   
+            `;
+            
+            const relaciones: any = await conn.query(myQuery_relaciones, [persona[0][0].id_persona]);
+            
+            // ERROR: La persona no es dueña de ningun vehiculo
+            if(!relaciones[0][0]) return respuesta.error(res, 400, 'Datos incorrectos');
+
+            // El dueño es conductor?
+            const myQuery_conductor = `
+                SELECT * FROM relaciones
+                INNER JOIN vehiculos ON relaciones.id_vehiculo = vehiculos.id_vehiculo
+                WHERE id_persona=? AND tipo_persona='chofer' AND relaciones.activo='1'   
+            `;
+        
+            const conductor: any = await conn.query(myQuery_conductor, [persona[0][0].id_persona]);
+
+            // Licencia de conducir
+            const myQuery_licencia = `SELECT * FROM licencia WHERE id_persona=? AND activo='1'`;
+            const licencia: any = await conn.query(myQuery_licencia, [persona[0][0].id_persona]);
+
+            // Arreglos manuales
+            
+            let isDriver = 'F';
+
+            // -------------------------------------
+
+            if(conductor[0][0]){
+                isDriver = 'T';
+            }else{
+                isDriver = 'F';
+            } 
+
+            // -------------------------------------
+
+            let cabs: any[] = relaciones[0];
+
+            cabs.forEach( (elemento: any) => {
+                elemento.status = 1 ? elemento.status = 'ACTIVE' : elemento.status = 'INACTIVE';
+                elemento.color = 'BLANCO';
+                elemento.licensePlate = elemento.licensePlate.replace('-','').replace(' ','');
+            });
+
+            // Respuesta de la API
+            respuesta.success(res, { 
+                owner:{
+                    documentType: persona[0][0].tipo_identificacion,
+                    docNumber: persona[0][0].identificacion,
+                    isDriver,
+                    driverLicense: licencia[0][0]?.nro_licencia !== undefined ? licencia[0][0].nro_licencia : '',
+                    cabs
+                }
+            });
+        
+        }catch(error){
+            console.log(chalk.red(error));
+            respuesta.error(res, 500);
+        }
+    }
+
+    // Obtener datos de chofer
+    async getCabDriver(req: Request, res: Response){
+        try{
+            
+            const { dni } = req.params;
+
+            // Conexion a la base de datos
+            const conn = await connect();
+    
+            // Datos de persona
+            const myQuery_persona = `SELECT * FROM personas WHERE identificacion=?`;
+            const persona: any = await conn.query(myQuery_persona, [dni]);
+            
+            // Error: Usuario no encontrado
+            if(!persona[0][0]) return respuesta.error(res, 400, 'Datos incorrectos');
+
+            // Tabla relaciones - Es chofer de algun vehiculo?
+            const myQuery_relaciones = `
+                SELECT * FROM relaciones
+                INNER JOIN vehiculos ON relaciones.id_vehiculo = vehiculos.id_vehiculo
+                WHERE id_persona=? AND tipo_persona='chofer' AND relaciones.activo='1'   
+            `;
+            
+            const relaciones: any = await conn.query(myQuery_relaciones, [persona[0][0].id_persona]);
+
+            // Error: El usuario no es conductor de ningun vehiculo
+            if(!relaciones[0][0]) return respuesta.error(res, 400, 'Datos incorrectos');
+
+
+            // Licencia de conducir
+            const myQuery_licencia = `SELECT * FROM licencia WHERE id_persona=? AND activo='1'`;
+            const licencia: any = await conn.query(myQuery_licencia, [persona[0][0].id_persona]);
+            
+            // Error: No se encontro la licencia de conducir
+            if(!licencia[0][0]) return respuesta.error(res, 400, 'Datos incorrectos');
+
+            // Respuesta correcta del sistema
+            respuesta.success(res, 
+                {   driver:    {
+                        documentType: persona[0][0].tipo_identificacion,
+                        docNumber: persona[0][0].identificacion,
+                        driverLicense: licencia[0][0].nro_licencia,
+                        status: relaciones[0][0].activo ? 'ACTIVE' : 'INACTIVE'
+                    }
+                }
+             );
+        
+        }catch(error){
+            console.log(chalk.red(error));
+            respuesta.error(res, 500);
+        }
+    }
+
+
+
+
 }
+
+
 
 export const TaxisController = new Taxis();

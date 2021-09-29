@@ -14,6 +14,7 @@ import path from 'path';
 import UsuariosRoutes from './routes/usuarios.routes';
 import AuthRoutes from './routes/auth.routes';
 import TaxisRoutes from './routes/taxis.routes';
+import DbUpdateRoutes from './routes/bd-update.routes';
 
 // [Express]
 const app = express();
@@ -26,6 +27,7 @@ app.use(express.static('src/public')); // Para prod solo 'public'
 app.use('/getToken', AuthRoutes);
 app.use('/usuarios', UsuariosRoutes);
 app.use('/taxis', TaxisRoutes);
+app.use('/db-update', DbUpdateRoutes);
 
 // Ejecución de servidor
 app.listen(app.get('PORT'), () => {

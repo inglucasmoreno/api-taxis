@@ -10,15 +10,14 @@ class Auth {
     
     // Metodo: Login de usuario
     public async login(req: Request, res: Response) {
-        console.log('entra');
         try{
 
-            const {usuario, password} = req.body;
+            const {userName, password} = req.body;
     
             const conn = await connect();
 
             // Se verifica si el usuario y contraseña son correctos
-            const usuarioDB: any = await conn.query('SELECT * FROM users WHERE usuario = ? AND password = ?',[usuario, password]);
+            const usuarioDB: any = await conn.query('SELECT * FROM users WHERE usuario = ? AND password = ?',[userName, password]);
             if(usuarioDB[0].length == 0) return respuesta.error(res, 400, 'Los datos son incorrectos');
                         
             // Se verifica si el usuario esta activo
