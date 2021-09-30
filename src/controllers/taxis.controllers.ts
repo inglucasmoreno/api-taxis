@@ -16,7 +16,7 @@ class Taxis {
         const conn = await connect();
     
         // Se traen los datos de la persona    
-        const persona: any = await conn.query("SELECT * FROM personas WHERE identificacion=?",[dni]);
+        const persona: any = await conn.query("SELECT * FROM personas WHERE identificacion=? AND fecha_nacimiento=?",[dni]);
         
         // Existe un usuario habilitado?
         if(!persona[0][0]) respuesta.error(res, 404, 'No autorizado');
@@ -78,14 +78,14 @@ class Taxis {
     // Obtener datos de titular
     async getCabOwner(req: Request, res: Response){
         try{
-            const { dni } = req.params;
+            const { dni, fecha_nacimiento } = req.params;
             
             // Conexion a la base de datos
             const conn = await connect();
             
             // Datos de persona
-            const myQuery_persona = `SELECT * FROM personas WHERE identificacion=?`;
-            const persona: any = await conn.query(myQuery_persona, [dni]);         
+            const myQuery_persona = `SELECT * FROM personas WHERE identificacion=? AND fecha_nacimiento=?`;
+            const persona: any = await conn.query(myQuery_persona, [dni, fecha_nacimiento]);         
             
             // Error: Usuario no encontrado
             if(!persona[0][0]) return respuesta.error(res, 400, "Datos incorrectos");
@@ -158,14 +158,14 @@ class Taxis {
     async getCabDriver(req: Request, res: Response){
         try{
             
-            const { dni } = req.params;
+            const { dni, fecha_nacimiento } = req.params;
 
             // Conexion a la base de datos
             const conn = await connect();
     
             // Datos de persona
-            const myQuery_persona = `SELECT * FROM personas WHERE identificacion=?`;
-            const persona: any = await conn.query(myQuery_persona, [dni]);
+            const myQuery_persona = `SELECT * FROM personas WHERE identificacion=? AND fecha_nacimiento=?`;
+            const persona: any = await conn.query(myQuery_persona, [dni, fecha_nacimiento]);
             
             // Error: Usuario no encontrado
             if(!persona[0][0]) return respuesta.error(res, 400, 'Datos incorrectos');

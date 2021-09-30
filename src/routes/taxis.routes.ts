@@ -10,10 +10,10 @@ const router = Router();
 // router.post('/data',validaciones.jwt ,TaxisController.getData);
 
 // GetCabDriver
-router.get('/getCabDriver/:dni', [validaciones.jwt], TaxisController.getCabDriver);
+router.get('/getCabDriver/:dni/:fecha_nacimiento', [validaciones.jwt], TaxisController.getCabDriver);
 
 // GetCabOwner
-router.get('/getCabOwner/:dni', [validaciones.jwt] ,TaxisController.getCabOwner);
+router.get('/getCabOwner/:dni/:fecha_nacimiento', [validaciones.jwt] ,TaxisController.getCabOwner);
 
 export default router;
 
