@@ -92,7 +92,7 @@ class Taxis {
 
             // Relaciones
             const myQuery_relaciones = `
-                SELECT vehiculos.dominio as licensePlate, vehiculos.marca as carBrand, vehiculos.modelo as carModel, vehiculos.activo as status FROM relaciones
+                SELECT vehiculos.dominio as licensePlate, vehiculos.nro_licencia as cabLicensePlate, vehiculos.marca as carBrand, vehiculos.modelo as carModel, vehiculos.activo as status FROM relaciones
                 INNER JOIN vehiculos ON relaciones.id_vehiculo = vehiculos.id_vehiculo
                 WHERE id_persona=? AND tipo_persona='titular' AND relaciones.activo='1'   
             `;
