@@ -25,7 +25,7 @@ class Auth {
                 const { userName, password } = req.body;
                 const conn = yield database_1.connect();
                 // Se verifica si el usuario y contraseña son correctos
-                const usuarioDB = yield conn.query('SELECT * FROM login WHERE usuario = ? AND password = ?', [userName, password]);
+                const usuarioDB = yield conn.query('SELECT * FROM users WHERE usuario = ? AND password = ?', [userName, password]);
                 if (usuarioDB[0].length == 0)
                     return response_1.respuesta.error(res, 400, 'Los datos son incorrectos');
                 // Se verifica si el usuario esta activo

@@ -16,6 +16,7 @@ const chalk_1 = __importDefault(require("chalk"));
 const usuarios_routes_1 = __importDefault(require("./routes/usuarios.routes"));
 const auth_routes_1 = __importDefault(require("./routes/auth.routes"));
 const taxis_routes_1 = __importDefault(require("./routes/taxis.routes"));
+const bd_update_routes_1 = __importDefault(require("./routes/bd-update.routes"));
 // [Express]
 const app = express_1.default();
 app.set('PORT', process.env.PORT || 3000);
@@ -26,6 +27,7 @@ app.use(express_1.default.static('src/public')); // Para prod solo 'public'
 app.use('/getToken', auth_routes_1.default);
 app.use('/usuarios', usuarios_routes_1.default);
 app.use('/taxis', taxis_routes_1.default);
+app.use('/db-update', bd_update_routes_1.default);
 // Ejecución de servidor
 app.listen(app.get('PORT'), () => {
     console.log(chalk_1.default.blue('[Desarrollador] - ') + 'Equinoccio Technology');
