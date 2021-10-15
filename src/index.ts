@@ -8,13 +8,13 @@
 // Imports
 import express from 'express';
 import chalk from 'chalk';
-import path from 'path';
 
 // Imports - Rutas
 import UsuariosRoutes from './routes/usuarios.routes';
 import AuthRoutes from './routes/auth.routes';
 import TaxisRoutes from './routes/taxis.routes';
 import DbUpdateRoutes from './routes/bd-update.routes';
+import helmet from 'helmet';
 
 // [Express]
 const app = express();
@@ -22,6 +22,7 @@ app.set('PORT', process.env.PORT || 3000);
 app.use(require('cors')());
 app.use(express.json());
 app.use(express.static('src/public')); // Para prod solo 'public'
+app.use(helmet());                     // Seguridad
 
 // [Rutas]
 app.use('/getToken', AuthRoutes);
