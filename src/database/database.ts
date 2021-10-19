@@ -1,11 +1,10 @@
-import { createPool } from 'mysql2/promise';
+import { createPool, createConnection } from 'mysql2/promise';
 
 export async function connect() {
-    const connection = await createPool({
+    const connection = await createConnection({
         host: 'localhost',
         user: 'root',
         database: 'identificador_vehicular',
-        connectionLimit: 10   
     });
     return connection;    
 }

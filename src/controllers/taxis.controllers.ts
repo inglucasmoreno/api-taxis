@@ -69,20 +69,21 @@ class Taxis {
                 patente: vehiculo[0][0].dominio,
                 color: vehiculo[0][0].color,
             }
+            conn.end();
             respuesta.success(res, {vehiculo: data});
         }else{
+            conn.end();
             respuesta.error(res, 404, 'No autorizado');
         }
     }
 
     // Obtener datos de titular
     async getCabOwner(req: Request, res: Response){
+        // Conexion a la base de datos
+        const conn = await connect();       
         try{
             const { dni, fecha_nacimiento } = req.params;
-            
-            // Conexion a la base de datos
-            const conn = await connect();
-            
+                        
             // Datos de persona
             const myQuery_persona = `SELECT * FROM personas WHERE identificacion=? AND fecha_nacimiento=?`;
             const persona: any = await conn.query(myQuery_persona, [dni, fecha_nacimiento]);         
@@ -136,6 +137,8 @@ class Taxis {
                 elemento.color = 'BLANCO';
                 elemento.licensePlate = elemento.licensePlate.replace('-','').replace(' ','');
             });
+            
+            conn.end();
 
             // Respuesta de la API
             respuesta.success(res, { 
@@ -149,6 +152,7 @@ class Taxis {
             });
         
         }catch(error){
+            conn.end();
             console.log(chalk.red(error));
             respuesta.error(res, 500);
         }
@@ -156,12 +160,11 @@ class Taxis {
 
     // Obtener datos de chofer
     async getCabDriver(req: Request, res: Response){
+        // Conexion a la base de datos
+        const conn = await connect();
         try{
             
             const { dni, fecha_nacimiento } = req.params;
-
-            // Conexion a la base de datos
-            const conn = await connect();
     
             // Datos de persona
             const myQuery_persona = `SELECT * FROM personas WHERE identificacion=? AND fecha_nacimiento=?`;
@@ -190,6 +193,8 @@ class Taxis {
             // Error: No se encontro la licencia de conducir
             if(!licencia[0][0]) return respuesta.error(res, 400, 'Datos incorrectos');
 
+            conn.end();
+
             // Respuesta correcta del sistema
             respuesta.success(res, 
                 {   driver:    {
@@ -202,13 +207,11 @@ class Taxis {
              );
         
         }catch(error){
+            conn.end();
             console.log(chalk.red(error));
             respuesta.error(res, 500);
         }
     }
-
-
-
 
 }
 
